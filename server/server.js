@@ -19,30 +19,34 @@
 // // await connectDB();
 // app.listen(PORT, () => console.log("Server running on port " + PORT));
 
-import "dotenv/config";
+// File: api/server.js
+
 import express from "express";
-import cors from "cors";
+import serverlessExpress from "@vendia/serverless-express";
 import connectDB from "./configs/mongodb.js";
 
-const PORT = process.env.PORT || 4000;
+import "dotenv/config";
+import cors from "cors";
+
 const app = express();
 
-// Initialize middleware
-app.use(express.json());
+// Middleware
 app.use(cors());
+app.use(express.json());
 
-// API Routes
-app.get("/", (req, res) => res.send("API Working"));
+// Routes
+app.get("/", (req, res) => {
+  res.send("✅ API Working from Vercel");
+});
 
-// Start server after DB connection
-async function startServer() {
-  try {
-    await connectDB();
-    app.listen(PORT, () => console.log("Server running on port " + PORT));
-  } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
-}
+// Ensure DB is connected before exporting the handler
+let server;
 
-startServer();
+const start = async () => {
+  await connectDB();
+  server = serverlessExpress({ app });
+};
+
+await start();
+
+export default server;
