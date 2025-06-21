@@ -35,7 +35,7 @@ app.use(express.json());
 app.use(cors());
 
 // API Routes
-app.get("/api/user/webhooks", (req, res) => res.send("API Working"));
+app.get("/", (req, res) => res.send("API Working"));
 
 // Modified startup for serverless compatibility
 const startServer = async () => {
