@@ -67,6 +67,10 @@ import userModel from "../models/userModel.js";
 
 const clerkWebhooks = async (req, res) => {
   try {
+    console.log("WEBHOOK HIT!");
+    console.log("Headers:", req.headers);
+    console.log("Body:", JSON.stringify(req.body, null, 2));
+
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
     await whook.verify(JSON.stringify(req.body), {
@@ -77,8 +81,11 @@ const clerkWebhooks = async (req, res) => {
 
     const { data, type } = req.body;
 
+    console.log("Webhook type:", type);
+
     switch (type) {
       case "user.created": {
+        console.log("Handling user.created event");
         const userData = {
           clerkId: data.id,
           email: data.email_addresses?.[0]?.email_address || "",
@@ -91,11 +98,11 @@ const clerkWebhooks = async (req, res) => {
           upsert: true,
           new: true,
         });
-
         break;
       }
 
       case "user.updated": {
+        console.log("Handling user.updated event");
         const userData = {
           email: data.email_addresses?.[0]?.email_address || "",
           firstName: data.first_name,
@@ -106,23 +113,23 @@ const clerkWebhooks = async (req, res) => {
         await userModel.findOneAndUpdate({ clerkId: data.id }, userData, {
           new: true,
         });
-
         break;
       }
 
       case "user.deleted": {
+        console.log("Handling user.deleted event");
         await userModel.findOneAndDelete({ clerkId: data.id });
         break;
       }
 
       default:
-        console.log(`Unhandled webhook event type: ${type}`);
+        console.log("Unhandled event type:", type);
         break;
     }
 
     res.json({ success: true });
   } catch (error) {
-    console.log(error);
+    console.log("Webhook error:", error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 };
