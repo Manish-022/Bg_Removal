@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -9,6 +10,7 @@ const userSchema = new mongoose.Schema({
   creditBalance: { type: Number, default: 5 },
 });
 
-const userModel = mongoose.models.user || mongoose.model("user", userSchema);
+// ✅ Capitalize the model name → "User"
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
-export default userModel;
+export default User;
